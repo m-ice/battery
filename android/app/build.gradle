@@ -62,8 +62,9 @@ if (envPropsFile.exists()) {
 
 android {
     namespace = "com.qd.battery"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 35
+//    compileSdk = flutter.compileSdkVersion
+//    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -89,7 +90,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         minSdkVersion 23
-        targetSdkVersion 34
+        targetSdkVersion 35
 
         ndk {
             // 设置支持的 so 库架构 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'

@@ -18,7 +18,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.27.1"  # 替换为你的 Flutter 版本
+          flutter-version: "3.24.4"  # 替换为你的 Flutter 版本
           android-license: true   # 自动接受 Android SDK licenses
 
 
