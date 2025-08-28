@@ -1,0 +1,148 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+def envProperties = new Properties()
+def envPropsFile = rootProject.file('../configs/env.props')
+def envPropertiesFile = rootProject.file('../configs/env.properties')
+
+if (envPropertiesFile.exists() && envPropsFile.exists()) {
+    println "====================================================================="
+    println "⚠️  Warning: env.properties is deprecated, please rename to env.props"
+    println "====================================================================="
+}
+
+if (envPropertiesFile.exists() && !envPropsFile.exists()) {
+    println "================================================================="
+    println "⚠️  Warning: env.properties is deprecated and should not be used"
+    println "🪄️  env.properties has been renamed to env.props automatically"
+    println "================================================================="
+
+    ant.move file: '../../configs/env.properties', tofile: '../../configs/env.props'
+}
+
+envPropsFile = rootProject.file('../configs/env.props')
+envPropertiesFile = rootProject.file('../configs/env.properties')
+
+if (envPropsFile.exists()) {
+    println "🔧 Loading configs from configs/env.props..."
+    envPropsFile.withReader('UTF-8') { reader ->
+        envProperties.load(reader)
+    }
+} else {
+    if (envPropertiesFile.exists()) {
+        println "🔧 Loading configs from configs/env.properties..."
+        envPropertiesFile.withReader('UTF-8') { reader ->
+            envProperties.load(reader)
+        }
+    }
+}
+
+android {
+    namespace = "com.qd.battery"
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11
+    }
+    lintOptions {
+        // 如打包出现Failed to transform libs.jar to match attributes
+        checkReleaseBuilds false
+    }
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+//        applicationId = "com.qd.earphone2"
+        applicationId envProperties['androidPackageName']
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+//        minSdkVersion flutter.minSdkVersion
+        minSdk = flutter.minSdkVersion
+//        targetSdk = flutter.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        minSdkVersion 23
+        targetSdkVersion 34
+
+        ndk {
+            // 设置支持的 so 库架构 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+        }
+        resValue 'string', 'app_name', envProperties['appName']
+        resValue 'string', 'zaLoFlutterAppId', envProperties['zaLoFlutterAppId']
+        resValue 'string', 'zaLoFlutterAppIdProtocol', envProperties['zaLoFlutterAppIdProtocol']
+    }
+
+
+    signingConfigs {
+        release {
+            keyAlias envProperties['keyAlias']
+            keyPassword envProperties['keyPassword']
+            storeFile rootProject.file('../configs/' + envProperties['storeFile'])
+            storePassword envProperties['storePassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.release
+            shrinkResources true
+            minifyEnabled true // 混淆开启
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    sourceSets {
+//        main {
+//            jniLibs.srcDirs = ['libs']
+//        }
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+}
+
+dependencies {
+    implementation 'com.google.protobuf:protoc:21.0-rc-1'
+    // 使用明确的版本号
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //3D地图so及jar
+    implementation 'com.amap.api:3dmap:latest.integration'
+}
+
+
+flutter {
+    source = "../.."
+}

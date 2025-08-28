@@ -1,0 +1,13 @@
+
+      GetPage(
+        name: RouteNames.home,
+        page: () => const HomePage(),
+      ),
+      GetPage(
+        name: RouteNames.login,
+        page: () => const LoginPage(),
+      ),
+      GetPage(
+        name: RouteNames.virc,
+        page: () => const VircPage(),
+      ),
